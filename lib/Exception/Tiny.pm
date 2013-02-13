@@ -2,7 +2,7 @@ package Exception::Tiny;
 use strict;
 use warnings;
 use 5.008005;
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 use Data::Dumper ();
 use Scalar::Util ();
@@ -14,7 +14,7 @@ use overload
 
 use Class::Accessor::Lite (
     new => 1,
-    ro  => [qw/ message file line package /]
+    ro  => [qw/ message file line package subroutine /]
 );
 
 
@@ -27,8 +27,10 @@ sub throw {
     } else {
         %args = @_;
     }
+    $args{message} = $class unless defined $args{message} && $args{message} ne '';
 
     ($args{package}, $args{file}, $args{line}) = caller(0);
+    $args{subroutine} = (caller(1))[3];
 
     die $class->new(%args);
 }
@@ -40,7 +42,7 @@ sub rethrow {
 
 sub as_string {
     my $self = shift;
-    sprintf '%s at package:%s file:%s line:%s', $self->message, $self->package, $self->file, $self->line;
+    sprintf '%s at %s line %s.', $self->message, $self->file, $self->line;
 }
 
 sub dump {
@@ -74,9 +76,11 @@ simple example:
   package main;
   
   # try
-  eval {
-      MyException->throw( 'oops!' ); # same MyException->throw( message => 'oops!' );
-  };
+  sub foo {
+      eval {
+          MyException->throw( 'oops!' ); # same MyException->throw( message => 'oops!' );
+      };
+  }
   
   # catch
   if (my $e = $@) {
@@ -84,9 +88,10 @@ simple example:
           say $e->message; # show 'oops!'
           say $e->package; # show 'main'
           say $e->file; # show 'foo.pl'
-          say $e->line; # show '8'
+          say $e->line; # show '9'
+          say $e->subroutine; # show 'main:foo'
           say $e->dump; # dump self
-          say $e; # show 'oops! at package:main file:foo.pl line:8'
+          say $e; # show 'oops! at foo.pl line 9.'
           $e->rethrow; # rethrow MyException exception.
       }
   }
@@ -124,7 +129,7 @@ can you accessor for exception class:
           say $e->message; # show 'oops';
           say $e->status_code; # show '500';
           say $e->dfv->{missing}; # show 'name field is missing.'
-          say $e; # show 'oops at package:main file:bar.pl line:17'
+          say $e; # show 'oops at bar.pl line 17.'
       }
   }
 
@@ -141,7 +146,7 @@ can you catche nested class:
   eval { MyException::Validator->throw }
   
   my $e = $@;
-  say 'BaseException' if BaseException->caught($e); # show 'BaseException'
+  say $e if BaseException->caught($e); # show 'MyException::Validator at bar.pl line 9.'
 
 =head1 DESCRIPTION
 
@@ -168,6 +173,7 @@ re-throw the exception object.
 =head2 message
 
 It return the exception message.
+default is exception class name.
 
 =head2 package
 
@@ -180,6 +186,10 @@ It return the file name that exception has occurred.
 =head2 line
 
 It return the line number in file that exception has occurred.
+
+=head2 subroutine
+
+It return the subroutine name that exception has occurred.
 
 =head2 as_string
 

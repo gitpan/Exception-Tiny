@@ -10,9 +10,11 @@ SYNOPSIS
       package main;
   
       # try
-      eval {
-          MyException->throw( 'oops!' ); # same MyException->throw( message => 'oops!' );
-      };
+      sub foo {
+          eval {
+              MyException->throw( 'oops!' ); # same MyException->throw( message => 'oops!' );
+          };
+      }
   
       # catch
       if (my $e = $@) {
@@ -20,9 +22,10 @@ SYNOPSIS
               say $e->message; # show 'oops!'
               say $e->package; # show 'main'
               say $e->file; # show 'foo.pl'
-              say $e->line; # show '8'
+              say $e->line; # show '9'
+              say $e->subroutine; # show 'main:foo'
               say $e->dump; # dump self
-              say $e; # show 'oops! at package:main file:foo.pl line:8'
+              say $e; # show 'oops! at foo.pl line 9.'
               $e->rethrow; # rethrow MyException exception.
           }
       }
@@ -60,7 +63,7 @@ SYNOPSIS
               say $e->message; # show 'oops';
               say $e->status_code; # show '500';
               say $e->dfv->{missing}; # show 'name field is missing.'
-              say $e; # show 'oops at package:main file:bar.pl line:17'
+              say $e; # show 'oops at bar.pl line 17.'
           }
       }
 
@@ -77,7 +80,7 @@ SYNOPSIS
       eval { MyException::Validator->throw }
   
       my $e = $@;
-      say 'BaseException' if BaseException->caught($e); # show 'BaseException'
+      say $e if BaseException->caught($e); # show 'MyException::Validator at bar.pl line 9.'
 
 DESCRIPTION
     Exception::Tiny is too simple exception interface. This is the
@@ -97,7 +100,7 @@ INSTANCE METHODS
     re-throw the exception object.
 
   message
-    It return the exception message.
+    It return the exception message. default is exception class name.
 
   package
     It return the package name that exception has occurred.
@@ -107,6 +110,9 @@ INSTANCE METHODS
 
   line
     It return the line number in file that exception has occurred.
+
+  subroutine
+    It return the subroutine name that exception has occurred.
 
   as_string
     It returned in the format the exception contents of a simple string. You

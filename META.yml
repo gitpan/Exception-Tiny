@@ -20,7 +20,7 @@ no_index:
 provides:
   Exception::Tiny:
     file: lib/Exception/Tiny.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
   Class::Accessor::Lite: 0.05
   Data::Dumper: 0
@@ -31,4 +31,4 @@ resources:
   homepage: https://github.com/yappo/p5-Exception-Tiny
   license: http://dev.perl.org/licenses/
   repository: git://github.com/yappo/p5-Exception-Tiny.git
-version: v0.1.0
+version: v0.2.0
