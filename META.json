@@ -43,7 +43,7 @@
    "provides" : {
       "Exception::Tiny" : {
          "file" : "lib/Exception/Tiny.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -56,5 +56,5 @@
          "url" : "git://github.com/yappo/p5-Exception-Tiny.git"
       }
    },
-   "version" : "v0.2.0"
+   "version" : "v0.2.1"
 }

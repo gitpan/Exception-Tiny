@@ -2,7 +2,7 @@ package Exception::Tiny;
 use strict;
 use warnings;
 use 5.008005;
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.1';
 
 use Data::Dumper ();
 use Scalar::Util ();
@@ -53,7 +53,7 @@ sub dump {
 sub caught {
     my($class, $e) = @_;
     return if ref $class;
-    return unless Scalar::Util::blessed($e) && $e->isa($class);
+    return unless Scalar::Util::blessed($e) && UNIVERSAL::isa($e, $class);
     $e;
 }
 
